@@ -39,7 +39,12 @@ for ($i = 0; $i<$N; $i++) {
 }
 //------------------------------------------------
 
-function if_collision($x1, $v1, $x2, $v2, $t0){
+function if_collision($ball1, $ball2, $t0){
+
+	$x1 = $ball1->position;
+	$v1 = $ball1->speed;
+	$x2 = $ball2->position;
+	$v2 = $ball2->speed;
 
 	//Same Speed - No collision
 	if ( $v1 == $v2){
@@ -84,8 +89,8 @@ foreach ($input as $data) {
 		echo $balls[$finball]->move($fintime),"\n";
 	}	
 	// 2 Balls	
-	elseif ( $ballnum == 2){ 
-	       $t = if_collision($balls[0]->position, $balls[0]->speed, $balls[1]->position , $balls[1]->speed, 0);
+	elseif ( $ballnum == 2) { 
+		$t = if_collision($balls[0], $balls[1], 0);	
 
 		//If no collision, move finball normally 
 		if ( ($t == -1) || ($t > $fintime) ){
@@ -98,6 +103,11 @@ foreach ($input as $data) {
 			echo $balls[$finball]->move($fintime-$t),"\n";
 		}
 	}	
+
+	//3 Balls
+	elseif ( $ballnum == 3) {
+			
+	}
 }	
 
 
