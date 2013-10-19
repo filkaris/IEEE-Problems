@@ -29,15 +29,7 @@ class ball {
 
 }
 
-$input = array();
-
-// GET INPUT
-fscanf(STDIN, "%d\n", $N);
-for ($i = 0; $i<$N; $i++) { 
-	$string = fgets(STDIN);
-	$input[] = explode(' ',$string);	
-}
-//------------------------------------------------
+//Functions 
 
 function if_collision($ball1, $ball2, $t0){
 
@@ -69,6 +61,17 @@ function if_collision($ball1, $ball2, $t0){
 		}	
 	}	
 }
+
+$input = array();
+
+// GET INPUT
+fscanf(STDIN, "%d\n", $N);
+for ($i = 0; $i<$N; $i++) { 
+	$string = fgets(STDIN);
+	$input[] = explode(' ',$string);	
+}
+//------------------------------------------------
+
 
 $balls = array();
 foreach ($input as $data) {
@@ -105,8 +108,42 @@ foreach ($input as $data) {
 	}	
 
 	//3 Balls
-	elseif ( $ballnum == 3) {
-			
+	elseif ( $ballnum > 2) {
+		$tmin = 0;
+		$t0 = 0;
+		while ($tmin <= $fintime) {
+
+//echo "Position of final ball is ",$balls[$finball]->position,"\n";
+
+			$tmin = 99999;
+			$coll = -1;
+			for ($i	=0; $i< $ballnum-1; $i++) {
+				$t = if_collision($balls[$i], $balls[$i+1], $t0);
+				
+//echo "Collision $i = $t\n";
+
+				if ( ($t < $tmin) && ($t != -1) ) { 
+					$tmin = $t;
+					$coll = $i;
+				}
+			}
+//echo "Tmin is $tmin\n\n";
+			if ($tmin <= $fintime) {
+				
+				//Move all balls 
+				for ($k=0; $k < $ballnum; $k++) {
+//echo "Moving ball $k to pos ",$balls[$k]->move($tmin),"\n";
+					$balls[$k]->position = $balls[$k]->move($tmin-$t0);
+				}
+		
+				//Collide only the two
+				$balls[$coll]->collision();
+				$balls[$coll+1]->collision();
+
+				$t0 = $tmin;
+			}
+		}
+		echo $balls[$finball]->move($fintime-$t0),"\n";
 	}
 }	
 
