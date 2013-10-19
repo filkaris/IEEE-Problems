@@ -113,26 +113,22 @@ foreach ($input as $data) {
 		$t0 = 0;
 		while ($tmin <= $fintime) {
 
-//echo "Position of final ball is ",$balls[$finball]->position,"\n";
-
 			$tmin = 99999;
 			$coll = -1;
 			for ($i	=0; $i< $ballnum-1; $i++) {
+				//Check if pair of balls collides
 				$t = if_collision($balls[$i], $balls[$i+1], $t0);
 				
-//echo "Collision $i = $t\n";
-
+				//Find first collision
 				if ( ($t < $tmin) && ($t != -1) ) { 
 					$tmin = $t;
 					$coll = $i;
 				}
 			}
-//echo "Tmin is $tmin\n\n";
 			if ($tmin <= $fintime) {
 				
 				//Move all balls 
 				for ($k=0; $k < $ballnum; $k++) {
-//echo "Moving ball $k to pos ",$balls[$k]->move($tmin),"\n";
 					$balls[$k]->position = $balls[$k]->move($tmin-$t0);
 				}
 		
