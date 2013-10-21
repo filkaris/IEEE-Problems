@@ -1,8 +1,11 @@
 import sys
 
 
-# check if word belongs to the filter
+#delimiter list
+delimiters = " ","\n",",",".","?","!"
 
+
+# check if word belongs to the filter
 def bloom_valid( word ):
 	for letter in word:
 		index = dictionary[letter]
@@ -10,10 +13,6 @@ def bloom_valid( word ):
 			return False
 	return True
 		
-		
-#delimiter list
-
-delimiters = " ","\n",",",".","?","!"
 
 # Sanitizing string
 def split(delimiters, string, maxsplit=0):
@@ -21,32 +20,36 @@ def split(delimiters, string, maxsplit=0):
 	regex = '|'.join(map(re.escape, delimiters))
 	return re.split(regex, string, maxsplit)
 
+
 # Initializing bloom filter
 bloom = [False]*26
 dictionary = {} 
 
-# Mapping numbers to letter to acces the filter
+# Fill the filter
+def bloom_init( words ):
+	for word in words:
+		for letter in word:
+			index = dictionary[letter]
+			if bloom[index] == False:
+				bloom[index] = True
 
+
+# Mapping numbers to letter to acces the filter
 for (i,letter) in enumerate( 'abcdefghigklmnopqrstuvwxyz'):
 	dictionary[letter] = i
 
+# Interpret input
 data = sys.stdin.readlines()
 words = split(delimiters, data[0])
 
-# Fill the filter
-for word in words:
-	for letter in word:
-		index = dictionary[letter]
-		if bloom[index] == False:
-			bloom[index] = True
-
-
+# Calculate and shiit
+bloom_init( words )
 testwords = split(delimiters, data[1])
-print testwords
 count = 0
 for word in testwords:
 	nword = word.lower()
 	if bloom_valid( nword ):
 		count +=1
 
+print '\n'
 print count
