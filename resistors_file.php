@@ -20,6 +20,10 @@ class Resistor {
 		$this->end = $letters[1];
 		$this->name = $letters;
 	}
+
+	public function parallels($n) {
+		$this->value = 1/$n;
+	}
 }
 
 //Functions
@@ -132,10 +136,10 @@ function in_parallel($conn) {
 
 //GET INPUT-----------------------
 $input = array();
-
-fscanf(STDIN, "%d\n", $N);
+$f = fopen($argv[1],"r");
+fscanf($f, "%d\n", $N);
 for ($i = 0; $i<$N; $i++) { 
-	$string = fgets(STDIN);
+	$string = fgets($f);
 	$string = trim($string);
 	$input[] = explode(' ',$string);	
 }
@@ -162,10 +166,19 @@ foreach ($input as $data) {
 
 //INSERTION------------------------
 
-	//Insert all resistors
-	foreach ($data as $letter) {
+	//Insert all unique resistors
+	$un_data = array_unique($data);
+	foreach ($un_data as $letter) {
 		$res = new Resistor($letter);
 		insert_new($res);
+	}
+
+	//immediately calculate parallels from input
+	$parallel = array_count_values($data);
+	foreach ($parallel as $conn => $freq) {
+		if ($freq >= 2) {
+			$resistor[$conn][0]->parallels($freq);	
+		}
 	}
 
 	//Prune nodes after resistors inserted (all alphabet was 0)
@@ -197,7 +210,8 @@ foreach ($input as $data) {
 		foreach ($parallel as $conn => $freq) {
 			//If more than 2 then parallel:
 			if ($freq >= 2) {
-				in_parallel($conn);					
+				for ($i = 0; $i<($freq-1); $i++) 
+					in_parallel($conn);					
 			}
 		}
 	}
