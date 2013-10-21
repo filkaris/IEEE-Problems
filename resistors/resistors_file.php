@@ -79,6 +79,7 @@ function insert_new($res) {
 function in_series($key) {
 	global $resistor, $connections, $nodes;
 
+
 	//Return 'bc' , 'cd' for key = c
 	$conns = preg_grep('/['.$key.']/',$connections);
 
@@ -140,6 +141,7 @@ $f = fopen($argv[1],"r");
 fscanf($f, "%d\n", $N);
 for ($i = 0; $i<$N; $i++) { 
 	$string = fgets($f);
+	//No end of line at the end
 	$string = trim($string);
 	$input[] = explode(' ',$string);	
 }
@@ -164,6 +166,12 @@ foreach ($input as $data) {
 		$nodes[$i] = 0;
 	}
 
+//SANITIZATION--------------------
+/*
+	foreach ($data as $key => $lett) {
+		if ($lett[0] > $lett[1]) $data[$key] = strrev($lett);
+	}
+*/
 //INSERTION------------------------
 
 	//Insert all unique resistors
@@ -175,10 +183,12 @@ foreach ($input as $data) {
 
 	//immediately calculate parallels from input
 	$parallel = array_count_values($data);
+	arsort($parallel);
 	foreach ($parallel as $conn => $freq) {
-		if ($freq >= 2) {
-			$resistor[$conn][0]->parallels($freq);	
+		if ($freq < 2) {
+			break;
 		}
+		$resistor[$conn][0]->parallels($freq);	
 	}
 
 	//Prune nodes after resistors inserted (all alphabet was 0)
@@ -190,28 +200,28 @@ foreach ($input as $data) {
 	while (count($connections) > 1) {
 
 //IN SERIES-----------------------
-		foreach ($nodes as $key => $resno) {
-			//We look at inside nodes only
-			if ($key == 'a' || $key == 'z')
-				continue;
-
-			//If node has only 2 connections, then IN SERIES
-			if ($resno == 2) {
-				in_series($key);
-			}
-			//Delete now empty nodes
-			$nodes = array_filter($nodes); 
+		$to_series = array_keys($nodes,2);
+		$keys_ar = array_flip($to_series);	
+		if (isset($keys_ar['a'])) unset($keys_ar['a']);
+		if (isset($keys_ar['z'])) unset($keys_ar['z']);
+		foreach ($keys_ar as $key => $irrelevant) {
+			in_series($key);
 		}
+		$nodes = array_filter($nodes); 
+
 
 //IN PARALLEL---------------------
 		//Create array value => frequency
 		$parallel = array_count_values($connections);
-
+		//Sort array (high first)
+		arsort($parallel);
 		foreach ($parallel as $conn => $freq) {
-			//If more than 2 then parallel:
 			if ($freq >= 2) {
-				for ($i = 0; $i<($freq-1); $i++) 
-					in_parallel($conn);					
+				in_parallel($conn);
+			}
+			//Reached low? break!
+			else {
+				break;
 			}
 		}
 	}
@@ -220,6 +230,8 @@ foreach ($input as $data) {
 	$result = $resistor['az'][0]->value;
 	echo number_format($result, 4, '.', ''),"\n";
 }	
+
+
 
 
 ?>
