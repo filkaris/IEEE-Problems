@@ -5,14 +5,6 @@ import sys
 delimiters = " ","\n",",",".","?","!"
 
 
-# check if word belongs to the filter
-def bloom_valid( word ):
-	for letter in word:
-		index = dictionary[letter]
-		if bloom[index] == False:
-			return False
-	return True
-		
 
 # Sanitizing string
 def split(delimiters, string, maxsplit=0):
@@ -21,34 +13,56 @@ def split(delimiters, string, maxsplit=0):
 	return re.split(regex, string, maxsplit)
 
 
-# Initializing bloom filter
-bloom = [False]*26
-dictionary = {} 
 
-# Fill the filter
-def bloom_init( words ):
-	for word in words:
+
+
+class bloom:
+
+	def __init__(self, wordlist ):
+		
+		self.wordlist = wordlist
+		self.dictionary = {}
+		self.bloom = [False]*26
+		# Creating the dictionary
+		for (i,letter) in enumerate( 'abcdefghigklmnopqrstuvwxyz'):
+			self.dictionary[letter] = i
+
+		self.createFilter()
+
+	def createFilter( self ):
+
+		dictionary = self.dictionary
+		words = self.wordlist			
+		
+		for word in words:
+			for letter in word:
+				index = dictionary[letter]
+				if self.bloom[index] == False:
+					self.bloom[index] = True
+	
+
+	def validates( self, word ):
 		for letter in word:
-			index = dictionary[letter]
-			if bloom[index] == False:
-				bloom[index] = True
+			index = self.dictionary[letter]
+			if self.bloom[index] == False:
+				return False
+		return True
 
 
-# Mapping numbers to letter to acces the filter
-for (i,letter) in enumerate( 'abcdefghigklmnopqrstuvwxyz'):
-	dictionary[letter] = i
 
-# Interpret input
+
 data = sys.stdin.readlines()
+
 words = split(delimiters, data[0])
 
-# Calculate and shiit
-bloom_init( words )
+myfilter = bloom( words )
+
 testwords = split(delimiters, data[1])
+
 count = 0
 for word in testwords:
 	nword = word.lower()
-	if bloom_valid( nword ):
+	if myfilter.validates( nword ):
 		count +=1
 
 print '\n'
