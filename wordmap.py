@@ -17,12 +17,12 @@ def split(delimiters, string, maxsplit=0):
 
 
 class bloom:
-
+	
 	def __init__(self, wordlist ):
 		
 		self.wordlist = wordlist
 		self.dictionary = {}
-		self.bloom = [False]*26
+		self.sieve = [False]*26
 		# Creating the dictionary
 		for (i,letter) in enumerate( 'abcdefghigklmnopqrstuvwxyz'):
 			self.dictionary[letter] = i
@@ -37,33 +37,37 @@ class bloom:
 		for word in words:
 			for letter in word:
 				index = dictionary[letter]
-				if self.bloom[index] == False:
-					self.bloom[index] = True
+				if self.sieve[index] == False:
+					self.sieve[index] = True
 	
 
 	def validates( self, word ):
 		for letter in word:
 			index = self.dictionary[letter]
-			if self.bloom[index] == False:
+			if self.sieve[index] == False:
 				return False
 		return True
 
 
+	def debugme( self ):
+		print self.wordlist, self.sieve
 
 
-data = sys.stdin.readlines()
+if __name__ == '__main__':
 
-words = split(delimiters, data[0])
+	data = sys.stdin.readlines()
 
-myfilter = bloom( words )
+	words = split(delimiters, data[0])
 
-testwords = split(delimiters, data[1])
+	myfilter = bloom( words )
 
-count = 0
-for word in testwords:
-	nword = word.lower()
-	if myfilter.validates( nword ):
-		count +=1
+	testwords = split(delimiters, data[1])
 
-print '\n'
-print count
+	count = 0
+	for word in testwords:
+		nword = word.lower()
+		if myfilter.validates( nword ):
+			count +=1
+
+	print '\n'
+	print count
