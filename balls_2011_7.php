@@ -29,17 +29,14 @@ class ball {
 
 }
 
-$input = array();
+//Functions 
 
-// GET INPUT
-fscanf(STDIN, "%d\n", $N);
-for ($i = 0; $i<$N; $i++) { 
-	$string = fgets(STDIN);
-	$input[] = explode(' ',$string);	
-}
-//------------------------------------------------
+function if_collision($ball1, $ball2, $t0){
 
-function if_collision($x1, $v1, $x2, $v2, $t0){
+	$x1 = $ball1->position;
+	$v1 = $ball1->speed;
+	$x2 = $ball2->position;
+	$v2 = $ball2->speed;
 
 	//Same Speed - No collision
 	if ( $v1 == $v2){
@@ -65,6 +62,17 @@ function if_collision($x1, $v1, $x2, $v2, $t0){
 	}	
 }
 
+$input = array();
+
+// GET INPUT
+fscanf(STDIN, "%d\n", $N);
+for ($i = 0; $i<$N; $i++) { 
+	$string = fgets(STDIN);
+	$input[] = explode(' ',$string);	
+}
+//------------------------------------------------
+
+
 $balls = array();
 foreach ($input as $data) {
 
@@ -84,8 +92,8 @@ foreach ($input as $data) {
 		echo $balls[$finball]->move($fintime),"\n";
 	}	
 	// 2 Balls	
-	elseif ( $ballnum == 2){ 
-	       $t = if_collision($balls[0]->position, $balls[0]->speed, $balls[1]->position , $balls[1]->speed, 0);
+	elseif ( $ballnum == 2) { 
+		$t = if_collision($balls[0], $balls[1], 0);	
 
 		//If no collision, move finball normally 
 		if ( ($t == -1) || ($t > $fintime) ){
@@ -98,6 +106,41 @@ foreach ($input as $data) {
 			echo $balls[$finball]->move($fintime-$t),"\n";
 		}
 	}	
+
+	//3 Balls
+	elseif ( $ballnum > 2) {
+		$tmin = 0;
+		$t0 = 0;
+		while ($tmin <= $fintime) {
+
+			$tmin = 99999;
+			$coll = -1;
+			for ($i	=0; $i< $ballnum-1; $i++) {
+				//Check if pair of balls collides
+				$t = if_collision($balls[$i], $balls[$i+1], $t0);
+				
+				//Find first collision
+				if ( ($t < $tmin) && ($t != -1) ) { 
+					$tmin = $t;
+					$coll = $i;
+				}
+			}
+			if ($tmin <= $fintime) {
+				
+				//Move all balls 
+				for ($k=0; $k < $ballnum; $k++) {
+					$balls[$k]->position = $balls[$k]->move($tmin-$t0);
+				}
+		
+				//Collide only the two
+				$balls[$coll]->collision();
+				$balls[$coll+1]->collision();
+
+				$t0 = $tmin;
+			}
+		}
+		echo $balls[$finball]->move($fintime-$t0),"\n";
+	}
 }	
 
 
