@@ -139,6 +139,7 @@ foreach ($input as $data) {
 				$t0 = $tmin;
 			}
 		}
+		//Move for the rest of the time
 		echo $balls[$finball]->move($fintime-$t0),"\n";
 	}
 }	
