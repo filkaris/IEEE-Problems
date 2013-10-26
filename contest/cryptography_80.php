@@ -90,37 +90,45 @@ for ($i=0; $i<$length; $i++) {
 	}
 }
 
+
+
 foreach ($columns as $i => $col) {
 	if ($col !== '?') {
+		$bufk = array();
 		$sum = $col;
 		$sum -= 2;
 		$sum = ($sum + 26) % 26;
-
-
-		$d = 3;
-		$done = false;
-		if ($sum <= 9) {
-			$key2[$i] = 'A';
-			$sum2[$i] = $sum;
-			$done = true;
-		}
-		elseif ( 
-			($sum % 2 == 0) &&
-			($sum < 20)
-		) {
-			$key2[$i] = 'B';
-			$sum2[$i] = $sum / 2;
-			$done = true;
-		}
-
-		while (!$done) {
-			if ($sum % $d == 0) {
-				$key2[$i] = num_to_char($d);
-				$sum2[$i] = $sum / $d;
+		for ($sum; $sum < 234; $sum+=26) {
+			$d = 3;
+			$done = false;
+			if ($sum <= 9) {
+				$bufk[$sum] = 1;
 				$done = true;
 			}
-			$d++;
+			elseif ( 
+				($sum % 2 == 0) &&
+				($sum < 20)
+			) {
+				$bufk[$sum] = 2;
+				$done = true;
+			}
+
+			while (!$done) {
+				if ($sum % $d == 0) {
+					if ($sum / $d <= 9) {
+						$bufk[$sum] = $d;
+						$done = true;
+					}
+				}
+				$d++;
+			}
 		}
+		$win = min($bufk);
+		$sm = array_search($win,$bufk);
+
+		$key2[$i] = num_to_char($win);
+		$sum2[$i] = $sm / $win;
+		unset($bufk);
 	}
 }
 
