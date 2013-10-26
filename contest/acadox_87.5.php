@@ -119,6 +119,7 @@ foreach ($input as $item) {
 		print_error();
 	}
 }
+if (count($buffer) >1) print_error();
 $result = $buffer[0];
 printf("%04X\n",$result);
 
